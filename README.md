@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ## Foundry
 
 **Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
@@ -64,3 +65,7 @@ $ forge --help
 $ anvil --help
 $ cast --help
 ```
+=======
+# ToDoSmartContract
+The ToDo Smart Contract is a decentralized task management system built with Solidity. It allows users to create, update, mark as completed, and delete their personal tasks on the blockchain. 
+>>>>>>> main
