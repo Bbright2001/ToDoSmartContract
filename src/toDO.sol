@@ -4,13 +4,14 @@ pragma solidity ^0.8.13;
 
 contract ToDo{
 
-   enum priority {low, medium, high} 
+   enum Priority {low, medium, high} 
     //State
     struct Task {
         uint256 id;
         string taskName;
         bool completed;
         bool deleted;
+        Priority priority;
     }
 
         address public owner;
@@ -20,11 +21,11 @@ contract ToDo{
     error notOwner(address caller);
     error noTaskName();
     error taskAlreadyCompleted(uint256 id);
-    error taskAlreadyExist(uint256 id);
+    error invalidTaskId(uint256 id);
     
     //events
     event completedTask(string taskName, bool completed);
-    event addTask(string taskName, bool completed);
+    event addTask(string taskName, uint256 id);
     event modifyTask(string NewTaskName, bool completed);
     event deleteTask(string taskName, bool deleted);
     //constructor
@@ -43,5 +44,19 @@ contract ToDo{
             _;
      }
     //functions
+    function taskAdd(string memory _taskName, uint _taskId, Priority _priority) external {
+    
+        if(_taskId != userTasks[msg.sender].length) revert invalidTaskId(_taskId);
+
+            userTasks[msg.sender].push(Task({
+                id : _taskId,
+                taskName: _taskName,
+                completed: false,
+                deleted: false,
+                priority: _priority
+            }));
+            emit addTask(_taskName, _taskId);
+    }
+    
     
 }
