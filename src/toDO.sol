@@ -15,7 +15,9 @@ contract ToDo{
     }
 
         address public owner;
-    mapping(address => Task[]) public userTasks;
+        uint nextTaskId;
+    mapping(uint => Task) public tasks;
+    mapping(address => uint[]) public userTasks;
     //error
     error taskNOtFound(uint256 id);
     error notOwner(address caller);
@@ -25,7 +27,7 @@ contract ToDo{
     
     //events
     event completedTask(string taskName, bool completed);
-    event addTask(string taskName, uint256 id);
+    event TaskAdded(string taskName, uint256 id);
     event modifyTask(string NewTaskName, bool completed);
     event deleteTask(string taskName, bool deleted);
     //constructor
@@ -38,24 +40,21 @@ contract ToDo{
         _;
      }
 
-     modifier taskNotDone(uint _taskId){
-            Task storage task = userTasks[msg.sender][_taskId];
-            if(task.completed) revert taskAlreadyCompleted(_taskId);
-            _;
-     }
-    //functions
-    function taskAdd(string memory _taskName, uint _taskId, Priority _priority) external {
-    
-        if(_taskId != userTasks[msg.sender].length) revert invalidTaskId(_taskId);
 
-            userTasks[msg.sender].push(Task({
-                id : _taskId,
-                taskName: _taskName,
-                completed: false,
-                deleted: false,
-                priority: _priority
-            }));
-            emit addTask(_taskName, _taskId);
+    //functions
+    function taskAdd(string memory _taskName, Priority _priority) external {
+        uint taskId = nextTaskId++;
+
+        tasks[taskId] = Task({
+            id: taskId,
+            taskName: _taskName,
+            completed: false,
+            deleted: false,
+            priority: _priority
+        });
+
+        userTasks[msg.sender].push(taskId);
+        emit TaskAdded( _taskName, taskId);
     }
     
     
