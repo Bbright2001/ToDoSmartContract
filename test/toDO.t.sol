@@ -22,5 +22,15 @@ contract tesToDo is Test {
         assertEq(id, 0);
         assertEq(completed, false);
     }
-    
+    // Test to edit tasks
+
+    function testEditTask() external{
+        vm.prank(user1);
+        todo.taskAdd("participate in Grass Airdrop");
+        vm.prank(user1);
+        todo.editTask(0, "Learn Rust and Solidity");
+        (,string memory _newName,bool completed,) = todo.tasks(0);
+        assertEq(_newName, "Learn Rust and Solidity");
+        assertEq(completed, false);
+    }
 }
