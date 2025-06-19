@@ -96,4 +96,12 @@ contract ToDo{
 
           emit TaskDeleted(_taskName, _taskId);
     }
+    function getAllTasks() external view returns( uint[] memory){
+       uint[] memory ids = userTasks[msg.sender];
+       Task[] memory myTask = new Task[](ids.length);
+
+       for( uint i = 0; i < ids.length; i++){
+        myTask[i] = tasks[ids[i]];
+       }
+    }
 }
