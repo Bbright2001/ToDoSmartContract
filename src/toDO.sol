@@ -4,20 +4,18 @@ pragma solidity ^0.8.13;
 
 contract ToDo{
 
-   enum Priority {low, medium, high} 
     //State
     struct Task {
         uint256 id;
         string taskName;
         bool completed;
         bool deleted;
-        Priority priority;
     }
 
         address public owner;
         uint nextTaskId;
-    mapping(uint => Task) public tasks;
-    mapping(address => uint[]) public userTasks;
+        mapping(uint => Task) public tasks;
+        mapping(address => uint[]) public userTasks;
     //error
     error taskDoesntExist(uint taskId);
     error notOwner(address caller, uint taskId);
@@ -30,44 +28,36 @@ contract ToDo{
     event completedTask(string taskName, bool completed);
     event TaskAdded(string taskName, uint256 id);
     event modifyTask(string NewTaskName, bool completed);
-    event deleteTask(string taskName, bool deleted);
+    event TaskDeleted(string taskName, uint256 _taskId);
     //constructor
         constructor() {
             owner = msg.sender;
         }
-    //modifiers
-     modifier onlyOwner(address _caller) {
-        if(owner == msg.sender) revert notOwner(_caller);
-        _;
-     }
-
 
     //functions
-    function taskAdd(string memory _taskName, Priority _priority) external {
+    function taskAdd(string memory _taskName) external {
         uint taskId = nextTaskId++;
 
         tasks[taskId] = Task({
             id: taskId,
             taskName: _taskName,
             completed: false,
-            deleted: false,
-            priority: _priority
-            isOwner: true;
+            deleted: false
         });
 
         userTasks[msg.sender].push(taskId);
         emit TaskAdded( _taskName, taskId);
     }
     
-    function editTask(uint _taskId,string memory _newTaskName, priority _priority)external{
-        Task storage task = tasks[_taskId]
+    function editTask(uint _taskId,string memory _newTaskName)external{
+        Task storage task = tasks[_taskId];
 
-        if(task.id != _taskId) revert taskDoesntExist(uint _taskId)
+        if(task.id != _taskId) revert taskDoesntExist( _taskId);
         //to confirm owner
-        isOwner = false;
+        bool isOwner = false;
         uint[] storage ids = userTasks[ msg.sender];
-        for(i = 0, i < ids.length, i++){
-            if(ids[i] = _taskId){
+        for(uint i = 0; i < ids.length; i++){
+            if(ids[i] == _taskId){
                 isOwner = true;
                 break;
             }
@@ -77,12 +67,33 @@ contract ToDo{
 
         if(task.deleted == true) revert taskDeleted(_taskId);
 
-        task.id: _taskId;
-        task.taskName: _newTaskName;
-        task.completed: false;
-        task.deleted: false;
-        priority: _priority;
+        task.id = _taskId;
+        task.taskName = _newTaskName;
+        task.completed =  false;
+        task.deleted = false;
 
-        emit modifyTask(_newTaskName, false)
+        emit modifyTask(_newTaskName, false);
            }
+    function deleteTask(uint _taskId, string memory _taskName) external {
+        Task storage task = tasks[_taskId];
+        if(task.deleted == true) revert taskDeleted(_taskId);
+        require(task.completed == true, "This tasks has not been completed");
+        if(!(task.id == _taskId))  revert taskDoesntExist(_taskId);
+
+        bool found = false;
+        uint[] storage ids = userTasks[msg.sender];
+        for(uint i = 0; i < ids.length; i++){
+            if(ids[i] == _taskId){
+                found = true;
+
+                ids[i] = ids[ids.length -1];
+                ids.pop();
+                break;
+            }
+        }
+          delete task.id;
+
+
+          emit TaskDeleted(_taskName, _taskId);
+    }
 }
