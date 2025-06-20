@@ -29,8 +29,22 @@ contract tesToDo is Test {
         todo.taskAdd("participate in Grass Airdrop");
         vm.prank(user1);
         todo.editTask(0, "Learn Rust and Solidity");
+
+        
         (,string memory _newName,bool completed,) = todo.tasks(0);
         assertEq(_newName, "Learn Rust and Solidity");
         assertEq(completed, false);
+    }
+    //Test to delete Tasks
+    function testDeleteTask() external{
+        vm.prank(user1);
+        todo.taskAdd("leg day");
+        todo.taskAdd("visit Aso rock");
+
+        vm.prank(user1);
+        todo.deleteTask(1, "visit Aso rock");
+        (uint id,string memory name,,) = todo.tasks(1);
+        assertEq(id, 0);
+        assertEq(bytes(name).length, 0);
     }
 }

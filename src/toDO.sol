@@ -77,7 +77,6 @@ contract ToDo{
     function deleteTask(uint _taskId, string memory _taskName) external {
         Task storage task = tasks[_taskId];
         if(task.deleted == true) revert taskDeleted(_taskId);
-        require(task.completed == true, "This tasks has not been completed");
         if(!(task.id == _taskId))  revert taskDoesntExist(_taskId);
 
         bool found = false;
@@ -91,7 +90,7 @@ contract ToDo{
                 break;
             }
         }
-          delete task.id;
+          delete tasks[_taskId];
 
 
           emit TaskDeleted(_taskName, _taskId);
