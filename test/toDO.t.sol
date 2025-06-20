@@ -47,4 +47,22 @@ contract tesToDo is Test {
         assertEq(id, 0);
         assertEq(bytes(name).length, 0);
     }
+    //Test to get all user task 
+    function getMyTask() external{
+        vm.prank(user1);
+        todo.taskAdd("Learn Solidity");
+        todo.taskAdd("Learn Cairo");
+        todo.taskAdd("Learn rust");
+        todo.taskAdd("fix a bug in Open source");
+        vm.prank(user1);
+        todo.editTask(0,"Build a Token");
+        (,string memory _taskName,,) = todo.tasks(0);
+        assertEq(_taskName, "Build a token");
+
+        vm.prank(user1);
+        ToDo.Task[] memory myTasks = todo.getAllTasks();
+
+        assertEq(myTasks.length,4);
+        assertEq(myTasks[0].taskName,"Build a Token");
+    }
 }
